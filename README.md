@@ -201,8 +201,17 @@ and the Ask CorpNizam architecture (UI + response-category model, not yet
 wired to a live model, by design — see product brief section 48).
 
 `npm run lint`, `npm run typecheck`, `npm run test`, and `npm run build` all
-pass in this environment. End-to-end acceptance testing against a live
-Supabase project (real signups, live RLS enforcement, live document
-upload/download) has **not** been performed in this environment, because no
-Supabase project credentials were available here — see the PR description
-for the exact pass/fail/blocked status of each acceptance test.
+pass. `scripts/e2e-check.mjs` has also been run end-to-end against a real,
+freshly-migrated Supabase project — real signup, onboarding, directors,
+share-based ownership, a full director resignation (event → generated
+workflow → tasks), completing a task, tenant isolation between two real
+users, and a mobile viewport check all pass against live Postgres RLS, not
+mocks. That run also caught and fixed a real bug: `INSERT ... RETURNING` on
+a brand-new workspace failed RLS because the creator's OWNER membership row
+didn't exist yet at RETURNING-check time — fixed by making workspace
+creation atomic and letting a creator always read their own workspace (see
+`supabase/migrations/0005_fix_workspace_creation_rls.sql`), and a second bug
+in the onboarding wizard where React reused a DOM node across a
+`type="button"` → `type="submit"` swap, causing the form to occasionally
+auto-submit a step early (fixed with a `key` prop). See the conversation
+for the exact pass/fail status of each numbered acceptance test.

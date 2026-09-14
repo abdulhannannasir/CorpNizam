@@ -1,5 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { writeAuditLog } from "@/lib/audit/log";
+import type { Workspace } from "@/lib/types";
 
 function slugify(name: string): string {
   const base = name
@@ -18,24 +19,18 @@ export async function createWorkspace(
 ) {
   const slug = slugify(name);
 
+  // Creates the workspace and the creator's OWNER membership atomically via
+  // a single Postgres function (see supabase/migrations/0005), rather than
+  // two separate inserts: a failure between them would otherwise leave an
+  // orphaned, ownerless workspace, and INSERT ... RETURNING on a bare
+  // `.insert().select()` here would fail RLS until the membership row
+  // exists (the workspace's SELECT policy checks workspace membership).
   const { data: workspace, error } = await supabase
-    .from("workspaces")
-    .insert({ name, slug, created_by: userId })
-    .select()
-    .single();
+    .rpc("create_workspace_with_owner", { p_name: name, p_slug: slug })
+    .single<Workspace>();
 
   if (error || !workspace) {
     throw new Error(error?.message ?? "Failed to create workspace");
-  }
-
-  const { error: memberError } = await supabase.from("workspace_members").insert({
-    workspace_id: workspace.id,
-    user_id: userId,
-    role: "OWNER",
-  });
-
-  if (memberError) {
-    throw new Error(memberError.message);
   }
 
   await writeAuditLog(supabase, {

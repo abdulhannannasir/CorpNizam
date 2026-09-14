@@ -54,27 +54,35 @@ try {
   await page.waitForURL(/\/onboarding/, { timeout: 15000 });
   log("Signup creates an authenticated session (redirected to onboarding)", page.url().includes("/onboarding"));
 
-  // Onboarding: workspace + company
+  // Onboarding: workspace + company. Steps are toggled client-side via a
+  // single <form>, so wait for each step's heading before interacting —
+  // clicking the nav button by label alone races the step-index re-render.
   const workspaceName = `E2E Workspace ${rand}`;
   const companyName = `E2E Test Company ${rand} (Private) Limited`;
+
+  await page.getByRole("heading", { name: "Workspace" }).waitFor();
   await page.fill("#workspaceName", workspaceName);
-  await page.click('button:has-text("Next")');
+  await page.getByRole("button", { name: /^Next$/ }).click();
+
+  await page.getByRole("heading", { name: "Company" }).waitFor();
   await page.fill("#legalName", companyName);
   await page.fill("#registrationNumber", "REG-0001");
   await page.fill("#ntn", "NTN-0001");
-  await page.click('button:has-text("Next")');
-  // Directors step - add one director inline
+  await page.getByRole("button", { name: /^Next$/ }).click();
+
+  await page.getByRole("heading", { name: "Directors" }).waitFor();
   await page.fill("#directorName", "Ayesha Test Director");
-  await page.click('button:has-text("Skip / Next")');
-  // Shareholders step - skip
-  await page.click('button:has-text("Skip / Next")');
-  // Finish
-  await page.click('button:has-text("Finish")');
+  await page.getByRole("button", { name: /Skip \/ Next/ }).click();
+
+  await page.getByRole("heading", { name: "Shareholders" }).waitFor();
+  await page.getByRole("button", { name: /Skip \/ Next/ }).click();
+
+  await page.getByRole("heading", { name: "Done" }).waitFor();
+  await page.getByRole("button", { name: /^Finish$/ }).click();
   await page.waitForURL(/\/companies\//, { timeout: 15000 });
   log("Onboarding creates workspace + company + redirects to company profile", page.url().includes("/companies/"));
 
   const companyUrl = page.url().split("?")[0];
-  const companyId = companyUrl.split("/companies/")[1];
 
   // TEST 4: company creation persists after refresh
   await page.reload();
@@ -94,8 +102,12 @@ try {
   await page.goto(`${companyUrl}/directors`);
   await page.fill("#full_name", "Bilal Test Director");
   await page.click('button:has-text("Add director")');
-  await page.waitForTimeout(1500);
-  const secondDirectorVisible = await page.getByText("Bilal Test Director").first().isVisible().catch(() => false);
+  const secondDirectorVisible = await page
+    .getByText("Bilal Test Director")
+    .first()
+    .waitFor({ timeout: 15000 })
+    .then(() => true)
+    .catch(() => false);
   log("Second director add works", secondDirectorVisible);
 
   // TEST 6: shareholders + ownership calculated from shares
@@ -103,11 +115,11 @@ try {
   await page.fill("#name", "Shareholder One");
   await page.fill("#shares", "60");
   await page.click('button:has-text("Add shareholder")');
-  await page.waitForTimeout(1500);
+  await page.getByText("Shareholder One").first().waitFor({ timeout: 15000 });
   await page.fill("#name", "Shareholder Two");
   await page.fill("#shares", "40");
   await page.click('button:has-text("Add shareholder")');
-  await page.waitForTimeout(1500);
+  await page.getByText("Shareholder Two").first().waitFor({ timeout: 15000 });
   const percentText = await page.textContent("body");
   const hasSixty = /60\.0%/.test(percentText);
   const hasForty = /40\.0%/.test(percentText);
@@ -165,7 +177,10 @@ try {
   const healthMatch = overviewText.match(/(\d{1,3})%/);
   log("Corporate health score rendered and derived from data", !!healthMatch, `score=${healthMatch?.[1]}`);
 
-  // TEST 3: tenant isolation — second user cannot access first user's company
+  // TEST 3: tenant isolation — user B, a member of their OWN workspace,
+  // must be denied access to user A's company. (Landing on /onboarding
+  // with no workspace at all would be a weaker, inconclusive check — it
+  // wouldn't touch the RLS-backed company lookup at all.)
   const context2 = await browser.newContext();
   const page2 = await context2.newPage();
   const email2 = `e2e-b-${rand}@example.com`;
@@ -175,18 +190,47 @@ try {
   await page2.fill("#password", password);
   await page2.click('button[type="submit"]');
   await page2.waitForURL(/\/onboarding/, { timeout: 15000 });
-  // User B attempts to access User A's company directly by URL
+
+  await page2.getByRole("heading", { name: "Workspace" }).waitFor();
+  await page2.fill("#workspaceName", `User B Workspace ${rand}`);
+  await page2.getByRole("button", { name: /^Next$/ }).click();
+  await page2.getByRole("heading", { name: "Company" }).waitFor();
+  await page2.fill("#legalName", `User B Company ${rand}`);
+  await page2.getByRole("button", { name: /^Next$/ }).click();
+  await page2.getByRole("heading", { name: "Directors" }).waitFor();
+  await page2.getByRole("button", { name: /Skip \/ Next/ }).click();
+  await page2.getByRole("heading", { name: "Shareholders" }).waitFor();
+  await page2.getByRole("button", { name: /Skip \/ Next/ }).click();
+  await page2.getByRole("heading", { name: "Done" }).waitFor();
+  await page2.getByRole("button", { name: /^Finish$/ }).click();
+  await page2.waitForURL(/\/companies\//, { timeout: 15000 });
+
+  // Now user B (a real workspace member, just not of workspace A) tries
+  // user A's company URL directly.
   await page2.goto(companyUrl);
-  await page2.waitForTimeout(1500);
-  const deniedAccess = page2.url().includes("/companies") && !page2.url().includes(companyId);
-  log("Tenant isolation: user B redirected away from user A's company URL", deniedAccess, `landed at ${page2.url()}`);
+  await page2.waitForURL(/\/companies$/, { timeout: 15000 }).catch(() => {});
+  const deniedAccess = page2.url().endsWith("/companies");
+  log(
+    "Tenant isolation: user B (member of their own workspace) denied access to user A's company",
+    deniedAccess,
+    `landed at ${page2.url()}`,
+  );
   await context2.close();
 
-  // TEST 16 (partial): mobile viewport doesn't break the dashboard
+  // TEST 16 (partial): mobile viewport doesn't break the dashboard.
+  // Target the <h1> specifically — the sidebar nav also has an "Overview"
+  // link earlier in DOM order, and it's legitimately hidden at this width
+  // (`hidden md:block`), so a plain text match would pick that one first.
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto(`${BASE}/dashboard`);
-  const mobileOk = await page.getByText(/Overview/i).first().isVisible().catch(() => false);
-  log("Dashboard renders at mobile viewport (390px)", mobileOk);
+  const mobileOk = await page
+    .getByRole("heading", { name: "Overview" })
+    .isVisible()
+    .catch(() => false);
+  const noHorizontalScroll = await page.evaluate(
+    () => document.documentElement.scrollWidth <= document.documentElement.clientWidth + 1,
+  );
+  log("Dashboard renders at mobile viewport (390px)", mobileOk && noHorizontalScroll, `heading visible=${mobileOk} noHScroll=${noHorizontalScroll}`);
 } catch (err) {
   log("UNEXPECTED ERROR", false, err.message);
 } finally {

@@ -116,11 +116,15 @@ export default function OnboardingPage() {
                   Back
                 </Button>
                 {step < STEPS.length - 1 ? (
-                  <Button type="button" onClick={() => setStep((s) => Math.min(STEPS.length - 1, s + 1))}>
+                  <Button
+                    key="next"
+                    type="button"
+                    onClick={() => setStep((s) => Math.min(STEPS.length - 1, s + 1))}
+                  >
                     {step === 0 || step === 1 ? "Next" : "Skip / Next"}
                   </Button>
                 ) : (
-                  <Button type="submit" disabled={pending}>
+                  <Button key="finish" type="submit" disabled={pending}>
                     {pending ? "Setting up…" : "Finish"}
                   </Button>
                 )}
