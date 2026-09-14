@@ -13,7 +13,10 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "CorpNizam — Corporate Legal & Compliance Operating System",
+  title: {
+    default: "CorpNizam — Corporate Legal & Compliance Operating System",
+    template: "%s · CorpNizam",
+  },
   description:
     "CorpNizam brings company records, corporate events, compliance workflows, documents, deadlines, and audit trails into one operating system for Pakistani businesses.",
 };

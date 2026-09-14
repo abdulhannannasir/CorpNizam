@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { requireSession } from "@/lib/session/current";
 import { listCompanies } from "@/lib/companies/service";
@@ -5,6 +6,8 @@ import { listTasksForCompany } from "@/lib/workflows/service";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { StatusBadge } from "@/components/ui/badge";
 import { formatDate } from "@/lib/utils";
+
+export const metadata: Metadata = { title: "Tasks" };
 
 export default async function WorkspaceTasksPage() {
   const { supabase, workspaceId } = await requireSession();

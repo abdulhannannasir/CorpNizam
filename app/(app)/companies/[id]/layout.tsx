@@ -1,8 +1,19 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireCompanyAccess } from "@/lib/session/current";
 import { StatusBadge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  const { company } = await requireCompanyAccess(id);
+  return { title: company?.legal_name ?? "Company" };
+}
 
 const TABS = [
   { href: "", label: "Overview" },

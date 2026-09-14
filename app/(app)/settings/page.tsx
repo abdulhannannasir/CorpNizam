@@ -1,6 +1,9 @@
+import type { Metadata } from "next";
 import { requireSession } from "@/lib/session/current";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { StatusBadge } from "@/components/ui/badge";
+
+export const metadata: Metadata = { title: "Settings" };
 
 export default async function SettingsPage() {
   const { supabase, workspaceId, workspaceName } = await requireSession();

@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { requireSession } from "@/lib/session/current";
 import { listCompanies } from "@/lib/companies/service";
@@ -12,6 +13,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { StatusBadge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { formatDate } from "@/lib/utils";
+
+export const metadata: Metadata = { title: "Overview" };
 
 export default async function DashboardPage() {
   const { supabase, workspaceId } = await requireSession();
