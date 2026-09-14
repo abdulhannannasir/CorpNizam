@@ -26,6 +26,44 @@ const PRICING_PLANS = [
   },
 ];
 
+const FAQS = [
+  {
+    question: "What is CorpNizam?",
+    answer:
+      "CorpNizam is a corporate legal & compliance operating system for Pakistani businesses. It's company-centric and event-driven: every director change, share transfer, or new investment is recorded once as a corporate event, which automatically generates the workflow, tasks, and evidence requests needed to handle it — with a full audit trail of who did what, when.",
+  },
+  {
+    question: "Is CorpNizam a law firm, or does it give legal advice?",
+    answer:
+      "No. CorpNizam is software, not a law firm, and does not provide legal advice. Compliance content is always clearly labelled Verified (backed by a checked source) or Requires legal verification (not yet confirmed) — it never presents an unverified rule as settled law.",
+  },
+  {
+    question: "How is my company's data kept separate from other companies on the platform?",
+    answer:
+      "Every company belongs to a workspace, and Postgres Row Level Security enforces that isolation at the database level — not just in the UI. A user can only read or write data for workspaces they're a member of, and this is enforced by the database itself regardless of what the client sends.",
+  },
+  {
+    question: "What happens when I record something like a director resignation?",
+    answer:
+      "Recording the event updates the director's status, creates a corporate event record, and automatically generates a workflow with the relevant tasks (updating records, requesting supporting documents, flagging any filing that needs legal verification). Every step is written to the audit trail as it happens.",
+  },
+  {
+    question: "Where are my documents stored, and who can access them?",
+    answer:
+      "Documents live in a private storage bucket and are only ever served through short-lived signed URLs — there's no public link to a document, ever. Access follows the same workspace-role permissions as everything else.",
+  },
+  {
+    question: "Can I manage more than one company?",
+    answer:
+      "Yes. A workspace can hold multiple companies, and each plan sets a different limit — from 1 company on Starter up to unlimited companies on Professional.",
+  },
+  {
+    question: "Is CorpNizam specific to Pakistani companies?",
+    answer:
+      "Yes, the initial product is designed around Pakistani corporate structures and provinces. We're deliberately cautious about statutory detail, though: no SECP/FBR filing deadline, form, or penalty is presented as fact unless it has been verified against an official source — anything else is flagged as requiring legal verification.",
+  },
+];
+
 const SECTIONS = [
   {
     title: "The problem",
@@ -154,6 +192,25 @@ export default function LandingPage() {
               </Card>
             ))}
           </div>
+        </div>
+      </section>
+
+      <section id="faq" className="mx-auto max-w-3xl px-6 py-16">
+        <h2 className="text-center text-2xl font-semibold text-slate-900">
+          Frequently asked questions
+        </h2>
+        <div className="mt-10 divide-y divide-slate-200 border-t border-b border-slate-200">
+          {FAQS.map((faq) => (
+            <details key={faq.question} className="group py-4">
+              <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-sm font-medium text-slate-900">
+                {faq.question}
+                <span className="shrink-0 text-slate-400 transition-transform group-open:rotate-45">
+                  +
+                </span>
+              </summary>
+              <p className="mt-3 text-sm leading-relaxed text-slate-600">{faq.answer}</p>
+            </details>
+          ))}
         </div>
       </section>
 
