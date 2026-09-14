@@ -1,10 +1,8 @@
 import { requireCompanyAccess } from "@/lib/session/current";
 import { listDocuments } from "@/lib/documents/service";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { StatusBadge } from "@/components/ui/badge";
-import { formatDate } from "@/lib/utils";
 import { UploadForm } from "./upload-form";
-import { DownloadLink } from "./download-link";
+import { DocumentItem } from "./document-item";
 
 export default async function DocumentsPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -35,18 +33,7 @@ export default async function DocumentsPage({ params }: { params: Promise<{ id: 
           ) : (
             <div className="space-y-3">
               {documents.map((d) => (
-                <div key={d.id} className="flex items-center justify-between border-b border-slate-100 pb-3 last:border-0">
-                  <div>
-                    <p className="text-sm font-medium text-slate-900">{d.name}</p>
-                    <p className="text-xs text-slate-500">
-                      {d.document_type.replaceAll("_", " ")} · Uploaded {formatDate(d.created_at)}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <StatusBadge status={d.status} />
-                    <DownloadLink companyId={id} path={d.storage_path} />
-                  </div>
-                </div>
+                <DocumentItem key={d.id} companyId={id} doc={d} />
               ))}
             </div>
           )}

@@ -132,9 +132,11 @@ npm run e2e
 
 `scripts/e2e-check.mjs` drives a real browser through signup, onboarding,
 directors, share-based ownership, recording a director resignation,
-completing a generated task, and a second user's browser being denied
-access to the first user's company (tenant isolation) — printing a
-PASS/FAIL line per acceptance-test scenario.
+completing a generated task, uploading a document and downloading it via
+its private signed URL, uploading a new document version, and a second
+user's browser being denied access to the first user's company (tenant
+isolation) — printing a PASS/FAIL line per acceptance-test scenario. All
+21 checks pass against a live, freshly-migrated Supabase project.
 
 Unit tests cover pure business logic that doesn't require a live database
 (ownership math, corporate health scoring, status derivation, RBAC helpers,
@@ -202,14 +204,17 @@ wired to a live model, by design — see product brief section 48).
 
 `npm run lint`, `npm run typecheck`, `npm run test`, and `npm run build` all
 pass. `scripts/e2e-check.mjs` has also been run end-to-end against a real,
-freshly-migrated Supabase project — real signup, onboarding, directors,
-share-based ownership, a full director resignation (event → generated
-workflow → tasks), completing a task, tenant isolation between two real
-users, and a mobile viewport check all pass against live Postgres RLS, not
-mocks. That run also caught and fixed a real bug: `INSERT ... RETURNING` on
-a brand-new workspace failed RLS because the creator's OWNER membership row
-didn't exist yet at RETURNING-check time — fixed by making workspace
-creation atomic and letting a creator always read their own workspace (see
+freshly-migrated Supabase project — all 21 checks pass against live
+Postgres RLS, not mocks: signup, onboarding, directors, share-based
+ownership, a full director resignation (event → generated workflow →
+tasks), completing a task, uploading a document and downloading it via its
+private signed URL, uploading a new document version while the previous
+one remains available, tenant isolation between two real users, and a
+mobile viewport check. That run also caught and fixed a real bug:
+`INSERT ... RETURNING` on a brand-new workspace failed RLS because the
+creator's OWNER membership row didn't exist yet at RETURNING-check time —
+fixed by making workspace creation atomic and letting a creator always
+read their own workspace (see
 `supabase/migrations/0005_fix_workspace_creation_rls.sql`), and a second bug
 in the onboarding wizard where React reused a DOM node across a
 `type="button"` → `type="submit"` swap, causing the form to occasionally

@@ -39,6 +39,19 @@ const context = await browser.newContext();
 const page = await context.newPage();
 page.setDefaultTimeout(15000);
 
+// Downloads use window.open(signedUrl, "_blank") — in this sandboxed
+// environment the spawned popup tab's own network stack doesn't reliably
+// reach external hosts (unlike Node's fetch, which does), so capture the
+// URL instead of trusting the popup to load, and verify it directly with
+// Node's fetch.
+await page.addInitScript(() => {
+  window.__capturedDownloadUrl = null;
+  window.open = (url) => {
+    window.__capturedDownloadUrl = url;
+    return null;
+  };
+});
+
 try {
   // TEST 2: protected route redirects logged-out user
   await page.goto(`${BASE}/dashboard`);
@@ -156,6 +169,50 @@ try {
   }
   const completedVisible = await page.getByText("COMPLETED").first().isVisible().catch(() => false);
   log("Task can be marked COMPLETED", completedVisible, `buttons found=${countBefore}`);
+
+  // TEST 11/12: document upload, private storage + signed-URL download,
+  // and versioning (previous version stays available, new one becomes current).
+  await page.goto(`${companyUrl}/documents`);
+  await page.fill("#name", "Board Resolution v1");
+  await page.setInputFiles("#file", {
+    name: "board-resolution.txt",
+    mimeType: "text/plain",
+    buffer: Buffer.from("Board resolution v1 contents"),
+  });
+  await page.click('button:has-text("Upload")');
+  await page.getByText("Board Resolution v1").first().waitFor({ timeout: 15000 });
+  log("Document uploaded and appears in the vault", true);
+
+  await page.getByRole("button", { name: /^Download$/ }).first().click();
+  await page.waitForFunction(() => window.__capturedDownloadUrl !== null, null, { timeout: 15000 });
+  const downloadUrl1 = await page.evaluate(() => window.__capturedDownloadUrl);
+  const isSignedUrl = /\/storage\/v1\/object\/sign\//.test(downloadUrl1) && /token=/.test(downloadUrl1);
+  let servesCorrectContent = false;
+  try {
+    const res = await fetch(downloadUrl1);
+    const text = await res.text();
+    servesCorrectContent = res.status === 200 && text === "Board resolution v1 contents";
+  } catch {
+    servesCorrectContent = false;
+  }
+  log(
+    "Document downloads via a private, short-lived signed URL serving the exact uploaded content",
+    isSignedUrl && servesCorrectContent,
+    downloadUrl1.slice(0, 70),
+  );
+
+  await page.getByRole("button", { name: /^Versions$/ }).first().click();
+  await page.getByText(/^v1 ·/).waitFor({ timeout: 15000 });
+  const versionFileInput = page.locator('input[type="file"]').last();
+  await versionFileInput.setInputFiles({
+    name: "board-resolution-v2.txt",
+    mimeType: "text/plain",
+    buffer: Buffer.from("Board resolution v2 contents"),
+  });
+  await page.click('button:has-text("Upload new version")');
+  await page.getByText(/^v2 ·/).waitFor({ timeout: 15000 });
+  const stillHasV1 = await page.getByText(/^v1 ·/).isVisible().catch(() => false);
+  log("New document version uploaded and previous version remains available", stillHasV1, "v1 and v2 both listed");
 
   // TEST 13: compliance obligation shows "Requires legal verification"
   await page.goto(`${companyUrl}/compliance`);
