@@ -34,6 +34,7 @@ export default function SignupPage() {
             <Input id="password" name="password" type="password" autoComplete="new-password" required minLength={8} />
           </div>
           {state?.error && <p className="text-sm text-red-600">{state.error}</p>}
+          {state?.info && <p className="text-sm text-green-700">{state.info}</p>}
           <Button type="submit" className="w-full" disabled={pending}>
             {pending ? "Creating account…" : "Create account"}
           </Button>
