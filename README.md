@@ -74,19 +74,29 @@ npm run dev
 ## Supabase setup
 
 1. Create a Supabase project.
-2. Apply the schema: `supabase/migrations/0001_init.sql` (via the Supabase
-   CLI — `supabase db push` — or paste it into the SQL editor). It creates
-   every table, index, and Row Level Security policy described below.
-3. Create a **private** storage bucket named `documents`. Documents are
-   never served from a public bucket — the app only ever requests
-   short-lived signed URLs (`lib/documents/service.ts`).
-4. Copy the project URL and anon key into `.env.local` (see
+2. Apply the migrations in `supabase/migrations/`, in order, via the
+   Supabase CLI (`supabase db push`) or by pasting each into the SQL
+   editor. `0001_init.sql` creates every table, index, and RLS policy;
+   `0002`–`0003` harden the RLS helper functions per the security advisor
+   (pinned `search_path`, moved two non-membership-checking lookups into a
+   `private` schema so they aren't exposed as public RPC endpoints);
+   `0004` creates the private `documents` storage bucket with tenant-scoped
+   policies on `storage.objects` — no separate manual bucket-creation step
+   is needed if you run this migration.
+3. Copy the project URL and publishable/anon key into `.env.local` (see
    `.env.example`).
+4. For local browser testing, disable **Confirm email** under
+   Authentication → Sign In / Providers → Email so signups return a session
+   immediately; otherwise Supabase's default email rate limit (a handful of
+   emails/hour before custom SMTP is configured) will block repeated
+   signups during testing.
 
 ### Migrations
 
 Keep schema changes as new files in `supabase/migrations/`, applied in
 order. Never hand-edit a production schema outside of a migration file.
+After any DDL change, run Supabase's security/performance advisors and
+address what they flag — that's how `0002`/`0003` were derived.
 
 ### Seed data
 
@@ -110,6 +120,21 @@ npm run typecheck    # tsc --noEmit
 npm run lint         # eslint
 npm run build        # next build
 ```
+
+For live acceptance testing against a running Supabase-backed instance
+(auth, tenant isolation, the director-resignation workflow, ownership
+math, document upload), start the dev server and run:
+
+```bash
+npm run dev -- -p 3100 &
+npm run e2e
+```
+
+`scripts/e2e-check.mjs` drives a real browser through signup, onboarding,
+directors, share-based ownership, recording a director resignation,
+completing a generated task, and a second user's browser being denied
+access to the first user's company (tenant isolation) — printing a
+PASS/FAIL line per acceptance-test scenario.
 
 Unit tests cover pure business logic that doesn't require a live database
 (ownership math, corporate health scoring, status derivation, RBAC helpers,
