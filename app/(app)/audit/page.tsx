@@ -1,6 +1,9 @@
+import type { Metadata } from "next";
 import { requireSession } from "@/lib/session/current";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatDate } from "@/lib/utils";
+
+export const metadata: Metadata = { title: "Audit Trail" };
 
 export default async function AuditTrailPage() {
   const { supabase, workspaceId } = await requireSession();

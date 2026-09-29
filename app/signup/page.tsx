@@ -12,7 +12,7 @@ export default function SignupPage() {
   const [state, formAction, pending] = useActionState(signup, initialState);
 
   return (
-    <div className="flex flex-1 items-center justify-center bg-slate-50 px-6 py-16">
+    <div id="main-content" className="flex flex-1 items-center justify-center bg-slate-50 px-6 py-16">
       <div className="w-full max-w-sm">
         <div className="mb-8 text-center">
           <Link href="/" className="text-lg font-semibold tracking-tight">
@@ -34,6 +34,7 @@ export default function SignupPage() {
             <Input id="password" name="password" type="password" autoComplete="new-password" required minLength={8} />
           </div>
           {state?.error && <p className="text-sm text-red-600">{state.error}</p>}
+          {state?.info && <p className="text-sm text-green-700">{state.info}</p>}
           <Button type="submit" className="w-full" disabled={pending}>
             {pending ? "Creating account…" : "Create account"}
           </Button>

@@ -6,6 +6,7 @@ import { loginSchema, signupSchema } from "@/lib/validation/schemas";
 
 export interface AuthFormState {
   error?: string;
+  info?: string;
 }
 
 export async function login(_prevState: AuthFormState, formData: FormData): Promise<AuthFormState> {
@@ -22,6 +23,9 @@ export async function login(_prevState: AuthFormState, formData: FormData): Prom
   const { error } = await supabase.auth.signInWithPassword(parsed.data);
 
   if (error) {
+    if (error.code === "email_not_confirmed") {
+      return { error: "Please confirm your email before logging in. Check your inbox for the confirmation link." };
+    }
     return { error: "We couldn't sign you in. Check your email and password and try again." };
   }
 
@@ -40,7 +44,7 @@ export async function signup(_prevState: AuthFormState, formData: FormData): Pro
   }
 
   const supabase = await createClient();
-  const { error } = await supabase.auth.signUp({
+  const { data, error } = await supabase.auth.signUp({
     email: parsed.data.email,
     password: parsed.data.password,
     options: { data: { full_name: parsed.data.fullName } },
@@ -48,6 +52,14 @@ export async function signup(_prevState: AuthFormState, formData: FormData): Pro
 
   if (error) {
     return { error: "We couldn't create your account. " + error.message };
+  }
+
+  // Email confirmation is required: signUp succeeds but returns no session,
+  // so there's nothing to redirect into yet — the user must confirm first.
+  if (!data.session) {
+    return {
+      info: "Account created. Check your email for a confirmation link before logging in.",
+    };
   }
 
   redirect("/onboarding");

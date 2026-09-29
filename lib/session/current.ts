@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getWorkspaceRole } from "@/lib/workspaces/service";
@@ -9,8 +10,12 @@ import type { WorkspaceRole } from "@/lib/types";
  * enough for the MVP's single-workspace-per-session UX. Every downstream
  * query still passes workspace_id explicitly and is re-checked by RLS, so
  * this is a UX convenience, not an authorization boundary.
+ *
+ * Wrapped in React's cache() so a layout, its generateMetadata, and its
+ * page — which each need the session independently — share one lookup
+ * per request instead of re-querying Supabase for the same data.
  */
-export async function requireSession() {
+export const requireSession = cache(async function requireSession() {
   const supabase = await createClient();
   const {
     data: { user },
@@ -34,9 +39,9 @@ export async function requireSession() {
     workspaceName: (membership.workspaces as unknown as { name: string })?.name ?? "Workspace",
     role: membership.role as WorkspaceRole,
   };
-}
+});
 
-export async function requireCompanyAccess(companyId: string) {
+export const requireCompanyAccess = cache(async function requireCompanyAccess(companyId: string) {
   const session = await requireSession();
   const { data: company, error } = await session.supabase
     .from("companies")
@@ -47,7 +52,7 @@ export async function requireCompanyAccess(companyId: string) {
   if (error || !company) redirect("/companies");
 
   return { ...session, company };
-}
+});
 
 export async function getWorkspaceRoleFor(workspaceId: string, userId: string) {
   const supabase = await createClient();

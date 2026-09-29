@@ -15,7 +15,7 @@ export default function OnboardingPage() {
   const [state, formAction, pending] = useActionState(completeOnboarding, initialState);
 
   return (
-    <div className="flex flex-1 items-center justify-center bg-slate-50 px-6 py-16">
+    <div id="main-content" className="flex flex-1 items-center justify-center bg-slate-50 px-6 py-16">
       <div className="w-full max-w-lg">
         <ol className="mb-6 flex items-center justify-between text-xs font-medium text-slate-400">
           {STEPS.map((s, i) => (
