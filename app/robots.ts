@@ -1,6 +1,9 @@
 import type { MetadataRoute } from "next";
 
-const BASE_URL = "https://corpnizam.vercel.app";
+// See app/sitemap.ts — same reasoning for resolving the production origin.
+const BASE_URL = process.env.VERCEL_PROJECT_PRODUCTION_URL
+  ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+  : "https://corpnizam.vercel.app";
 
 export default function robots(): MetadataRoute.Robots {
   return {

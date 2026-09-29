@@ -33,7 +33,7 @@ export function CookieConsent() {
       <div className="mx-auto flex max-w-5xl flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-sm text-slate-600">
           We use essential cookies to keep you signed in and remember your preferences. We don&apos;t
-          use cookies for advertising or tracking. See our approach in the FAQs below.
+          use cookies for advertising or tracking.
         </p>
         <div className="flex shrink-0 gap-2">
           <button

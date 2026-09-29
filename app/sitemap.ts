@@ -1,6 +1,11 @@
 import type { MetadataRoute } from "next";
 
-const BASE_URL = "https://corpnizam.vercel.app";
+// VERCEL_PROJECT_PRODUCTION_URL always points at the project's production
+// domain (the custom domain if one is configured), so preview deployments
+// don't list themselves — crawlers are meant to only ever see production.
+const BASE_URL = process.env.VERCEL_PROJECT_PRODUCTION_URL
+  ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+  : "https://corpnizam.vercel.app";
 
 // Only public, unauthenticated routes belong here — everything under the
 // (app) route group requires a session and middleware redirects logged-out

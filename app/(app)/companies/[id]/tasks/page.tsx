@@ -1,7 +1,7 @@
 import { requireCompanyAccess } from "@/lib/session/current";
 import { listWorkflowsForCompany } from "@/lib/workflows/service";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { StatusBadge } from "@/components/ui/badge";
+import { Badge, StatusBadge } from "@/components/ui/badge";
 import { formatDate } from "@/lib/utils";
 import { CompleteTaskButton } from "./complete-button";
 import type { WorkflowTask } from "@/lib/types";
@@ -54,7 +54,12 @@ export default async function TasksPage({
                 .map((t) => (
                   <div key={t.id} className="flex items-start justify-between gap-4 border-b border-slate-100 py-2 last:border-0">
                     <div>
-                      <p className="text-sm font-medium text-slate-900">{t.title}</p>
+                      <div className="flex items-center gap-2">
+                        <p className="text-sm font-medium text-slate-900">{t.title}</p>
+                        {t.requires_legal_verification && (
+                          <Badge tone="warning">Requires legal verification</Badge>
+                        )}
+                      </div>
                       <p className="mt-0.5 text-xs text-slate-500">{t.description}</p>
                       <div className="mt-1 flex items-center gap-2 text-xs text-slate-400">
                         <span>Priority: {t.priority}</span>

@@ -142,6 +142,7 @@ export interface WorkflowTask {
   priority: TaskPriority;
   assigned_to: string | null;
   requires_evidence: boolean;
+  requires_legal_verification: boolean;
   evidence_document_id: string | null;
   due_date: string | null;
   completed_at: string | null;

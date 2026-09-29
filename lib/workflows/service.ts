@@ -46,6 +46,7 @@ export async function generateWorkflow(
     priority: t.priority,
     status: "TODO" as const,
     requires_evidence: t.requiresEvidence,
+    requires_legal_verification: t.requiresLegalVerification,
     due_date: t.dueInDays != null ? addDays(eventDate, t.dueInDays) : null,
   }));
 
