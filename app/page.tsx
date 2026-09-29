@@ -99,132 +99,134 @@ export default function LandingPage() {
         </div>
       </header>
 
-      <section className="border-b border-slate-200 bg-white">
-        <div className="mx-auto max-w-4xl px-6 py-24 text-center">
-          <h1 className="text-4xl font-semibold tracking-tight text-slate-900 sm:text-5xl">
-            Run Your Company. Stay Corporate-Ready.
-          </h1>
-          <p className="mx-auto mt-6 max-w-2xl text-lg text-slate-600">
-            CorpNizam brings company records, corporate events, compliance workflows, documents,
-            deadlines, and audit trails into one operating system for Pakistani businesses.
-          </p>
-          <div className="mt-8 flex items-center justify-center gap-3">
-            <Link href="/signup">
-              <Button size="lg">Start Managing Your Company</Button>
-            </Link>
-            <Link href="#how-it-works">
-              <Button size="lg" variant="outline">
-                See How It Works
-              </Button>
-            </Link>
+      <main id="main-content">
+        <section className="border-b border-slate-200 bg-white">
+          <div className="mx-auto max-w-4xl px-6 py-24 text-center">
+            <h1 className="text-4xl font-semibold tracking-tight text-slate-900 sm:text-5xl">
+              Run Your Company. Stay Corporate-Ready.
+            </h1>
+            <p className="mx-auto mt-6 max-w-2xl text-lg text-slate-600">
+              CorpNizam brings company records, corporate events, compliance workflows, documents,
+              deadlines, and audit trails into one operating system for Pakistani businesses.
+            </p>
+            <div className="mt-8 flex items-center justify-center gap-3">
+              <Link href="/signup">
+                <Button size="lg">Start Managing Your Company</Button>
+              </Link>
+              <Link href="#how-it-works">
+                <Button size="lg" variant="outline">
+                  See How It Works
+                </Button>
+              </Link>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      <section id="how-it-works" className="mx-auto max-w-6xl px-6 py-16">
-        <div className="grid gap-6 sm:grid-cols-3">
-          {SECTIONS.map((s) => (
-            <Card key={s.title}>
-              <CardHeader>
-                <CardTitle>{s.title}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm leading-relaxed text-slate-600">{s.body}</p>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </section>
-
-      <section className="border-y border-slate-200 bg-white py-16">
-        <div className="mx-auto max-w-6xl px-6">
-          <h2 className="text-center text-2xl font-semibold text-slate-900">
-            Corporate events, compliance, documents, audit trail
-          </h2>
-          <div className="mt-10 grid gap-6 sm:grid-cols-4">
-            {[
-              { title: "Corporate Events", body: "Director resignations, appointments, share transfers, and new investments — recorded once, tracked everywhere." },
-              { title: "Compliance", body: "Obligations clearly labelled Verified or Requires legal verification — never a fabricated deadline." },
-              { title: "Documents", body: "A private, versioned document vault with signed-URL access — nothing is exposed publicly." },
-              { title: "Audit Trail", body: "Every material action is logged: who, what, when, and why. The log itself cannot be edited." },
-            ].map((f) => (
-              <div key={f.title}>
-                <h3 className="text-sm font-semibold text-slate-900">{f.title}</h3>
-                <p className="mt-2 text-sm text-slate-600">{f.body}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-6xl px-6 py-16">
-        <h2 className="text-center text-2xl font-semibold text-slate-900">Security</h2>
-        <p className="mx-auto mt-4 max-w-2xl text-center text-sm text-slate-600">
-          Every company belongs to a workspace, and every workspace is isolated by Postgres row-level
-          security enforced on the database itself — not just hidden in the UI. Documents are stored
-          in private buckets and served only via short-lived signed URLs.
-        </p>
-      </section>
-
-      <section id="pricing" className="border-t border-slate-200 bg-white py-16">
-        <div className="mx-auto max-w-6xl px-6">
-          <h2 className="text-center text-2xl font-semibold text-slate-900">Pricing</h2>
-          <div className="mt-10 grid gap-6 sm:grid-cols-3">
-            {PRICING_PLANS.map((plan) => (
-              <Card key={plan.name} className="flex flex-col">
+        <section id="how-it-works" className="mx-auto max-w-6xl px-6 py-16">
+          <div className="grid gap-6 sm:grid-cols-3">
+            {SECTIONS.map((s) => (
+              <Card key={s.title}>
                 <CardHeader>
-                  <CardTitle className="text-base">{plan.name}</CardTitle>
-                  <div className="flex items-baseline gap-1 pt-2">
-                    <span className="text-2xl font-semibold text-slate-900">{plan.price}</span>
-                    <span className="text-sm text-slate-500">{plan.period}</span>
-                  </div>
-                  <CardDescription>{plan.audience}</CardDescription>
+                  <CardTitle>{s.title}</CardTitle>
                 </CardHeader>
-                <CardContent className="flex flex-1 flex-col justify-between gap-4">
-                  <ul className="space-y-2 text-sm text-slate-600">
-                    {plan.features.map((f) => (
-                      <li key={f}>• {f}</li>
-                    ))}
-                  </ul>
-                  <Link href="/signup">
-                    <Button variant="outline" className="w-full">
-                      Get started
-                    </Button>
-                  </Link>
+                <CardContent>
+                  <p className="text-sm leading-relaxed text-slate-600">{s.body}</p>
                 </CardContent>
               </Card>
             ))}
           </div>
-        </div>
-      </section>
+        </section>
 
-      <section id="faq" className="mx-auto max-w-3xl px-6 py-16">
-        <h2 className="text-center text-2xl font-semibold text-slate-900">
-          Frequently asked questions
-        </h2>
-        <div className="mt-10 divide-y divide-slate-200 border-t border-b border-slate-200">
-          {FAQS.map((faq) => (
-            <details key={faq.question} className="group py-4">
-              <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-sm font-medium text-slate-900 transition-colors motion-reduce:transition-none hover:text-slate-600">
-                {faq.question}
-                <span className="shrink-0 text-slate-400 transition-transform duration-300 ease-out motion-reduce:transition-none group-open:rotate-45 group-open:text-slate-900">
-                  +
-                </span>
-              </summary>
-              <p className="mt-3 text-sm leading-relaxed text-slate-600">{faq.answer}</p>
-            </details>
-          ))}
-        </div>
-      </section>
+        <section className="border-y border-slate-200 bg-white py-16">
+          <div className="mx-auto max-w-6xl px-6">
+            <h2 className="text-center text-2xl font-semibold text-slate-900">
+              Corporate events, compliance, documents, audit trail
+            </h2>
+            <div className="mt-10 grid gap-6 sm:grid-cols-4">
+              {[
+                { title: "Corporate Events", body: "Director resignations, appointments, share transfers, and new investments — recorded once, tracked everywhere." },
+                { title: "Compliance", body: "Obligations clearly labelled Verified or Requires legal verification — never a fabricated deadline." },
+                { title: "Documents", body: "A private, versioned document vault with signed-URL access — nothing is exposed publicly." },
+                { title: "Audit Trail", body: "Every material action is logged: who, what, when, and why. The log itself cannot be edited." },
+              ].map((f) => (
+                <div key={f.title}>
+                  <h3 className="text-sm font-semibold text-slate-900">{f.title}</h3>
+                  <p className="mt-2 text-sm text-slate-600">{f.body}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
 
-      <section className="mx-auto max-w-4xl px-6 py-20 text-center">
-        <h2 className="text-2xl font-semibold text-slate-900">Ready to get corporate-ready?</h2>
-        <div className="mt-6">
-          <Link href="/signup">
-            <Button size="lg">Start Managing Your Company</Button>
-          </Link>
-        </div>
-      </section>
+        <section className="mx-auto max-w-6xl px-6 py-16">
+          <h2 className="text-center text-2xl font-semibold text-slate-900">Security</h2>
+          <p className="mx-auto mt-4 max-w-2xl text-center text-sm text-slate-600">
+            Every company belongs to a workspace, and every workspace is isolated by Postgres row-level
+            security enforced on the database itself — not just hidden in the UI. Documents are stored
+            in private buckets and served only via short-lived signed URLs.
+          </p>
+        </section>
+
+        <section id="pricing" className="border-t border-slate-200 bg-white py-16">
+          <div className="mx-auto max-w-6xl px-6">
+            <h2 className="text-center text-2xl font-semibold text-slate-900">Pricing</h2>
+            <div className="mt-10 grid gap-6 sm:grid-cols-3">
+              {PRICING_PLANS.map((plan) => (
+                <Card key={plan.name} className="flex flex-col">
+                  <CardHeader>
+                    <CardTitle className="text-base">{plan.name}</CardTitle>
+                    <div className="flex items-baseline gap-1 pt-2">
+                      <span className="text-2xl font-semibold text-slate-900">{plan.price}</span>
+                      <span className="text-sm text-slate-500">{plan.period}</span>
+                    </div>
+                    <CardDescription>{plan.audience}</CardDescription>
+                  </CardHeader>
+                  <CardContent className="flex flex-1 flex-col justify-between gap-4">
+                    <ul className="space-y-2 text-sm text-slate-600">
+                      {plan.features.map((f) => (
+                        <li key={f}>• {f}</li>
+                      ))}
+                    </ul>
+                    <Link href="/signup">
+                      <Button variant="outline" className="w-full">
+                        Get started
+                      </Button>
+                    </Link>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section id="faq" className="mx-auto max-w-3xl px-6 py-16">
+          <h2 className="text-center text-2xl font-semibold text-slate-900">
+            Frequently asked questions
+          </h2>
+          <div className="mt-10 divide-y divide-slate-200 border-t border-b border-slate-200">
+            {FAQS.map((faq) => (
+              <details key={faq.question} className="group py-4">
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-sm font-medium text-slate-900 transition-colors motion-reduce:transition-none hover:text-slate-600">
+                  {faq.question}
+                  <span className="shrink-0 text-slate-400 transition-transform duration-300 ease-out motion-reduce:transition-none group-open:rotate-45 group-open:text-slate-900">
+                    +
+                  </span>
+                </summary>
+                <p className="mt-3 text-sm leading-relaxed text-slate-600">{faq.answer}</p>
+              </details>
+            ))}
+          </div>
+        </section>
+
+        <section className="mx-auto max-w-4xl px-6 py-20 text-center">
+          <h2 className="text-2xl font-semibold text-slate-900">Ready to get corporate-ready?</h2>
+          <div className="mt-6">
+            <Link href="/signup">
+              <Button size="lg">Start Managing Your Company</Button>
+            </Link>
+          </div>
+        </section>
+      </main>
 
       <footer className="border-t border-slate-200 bg-white py-8">
         <div className="mx-auto max-w-6xl px-6 text-xs text-slate-400">
