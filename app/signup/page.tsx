@@ -12,7 +12,7 @@ export default function SignupPage() {
   const [state, formAction, pending] = useActionState(signup, initialState);
 
   return (
-    <div className="flex flex-1 items-center justify-center bg-slate-50 px-6 py-16">
+    <div id="main-content" className="flex flex-1 items-center justify-center bg-slate-50 px-6 py-16">
       <div className="w-full max-w-sm">
         <div className="mb-8 text-center">
           <Link href="/" className="text-lg font-semibold tracking-tight">

@@ -37,6 +37,9 @@ export function MobileNav() {
       {open && (
         <div
           id="mobile-nav-panel"
+          onClick={(e) => {
+            if ((e.target as HTMLElement).closest("a")) setOpen(false);
+          }}
           className="absolute inset-x-0 top-full z-40 max-h-[calc(100vh-3.25rem)] overflow-y-auto border-b border-slate-200 bg-white shadow-lg"
         >
           <SidebarNav />
