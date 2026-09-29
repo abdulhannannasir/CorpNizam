@@ -205,9 +205,9 @@ export default function LandingPage() {
         <div className="mt-10 divide-y divide-slate-200 border-t border-b border-slate-200">
           {FAQS.map((faq) => (
             <details key={faq.question} className="group py-4">
-              <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-sm font-medium text-slate-900">
+              <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-sm font-medium text-slate-900 transition-colors hover:text-slate-600">
                 {faq.question}
-                <span className="shrink-0 text-slate-400 transition-transform group-open:rotate-45">
+                <span className="shrink-0 text-slate-400 transition-transform duration-300 ease-out group-open:rotate-45 group-open:text-slate-900">
                   +
                 </span>
               </summary>
